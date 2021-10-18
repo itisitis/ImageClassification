@@ -50,7 +50,7 @@ $ python pred.py --input ./test_data/im1.jpg
 # Run the evaluation script
 $ python run_evaluation.py --class_1 ./test_data/indoor/ --class_2 ./test_data/outdoor/ --out_path ./
 
-the values of the evaluation script will be saved in evaluation.csv for reference.
+the findings of the evaluation script will be saved in evaluation.csv for reference.
 
 # Run the unit test
 $ python unit_test.py --indoor ./test_data/benchmark_in.jpg --outdoor ./test_data/benchmark_out.jpg
