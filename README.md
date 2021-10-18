@@ -52,7 +52,7 @@ the values of the evaluation script will be saved in evaluation.csv for referenc
 # Run the unit test
 $ python unit_test.py --indoor ./test_data/benchmark_in.jpg --outdoor ./test_data/benchmark_out.jpg
 
-# Recommendations to improve the model
+
 
  
 
