@@ -41,6 +41,9 @@ airplanes - Outdoor
 # To train the model
 $ python train.py
 
+# Download the model
+https://filetransfer.io/data-package/5os1lDnu#link
+
 # Run the inference script(CLI)
 $ python pred.py --input ./test_data/im1.jpg
 
