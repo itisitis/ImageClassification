@@ -1,5 +1,5 @@
 # ImageClassification
-An EfficientNetB4 based Image classifier for indoor and outdoor images of some categories selected from YouTube-8m dataset
+An EfficientNetB4 based Image classifier for indoor and outdoor images of some categories selected from YouTube-8m dataset. 
 
 # Installation
 Numpy
@@ -54,6 +54,14 @@ the findings of the evaluation script will be saved in evaluation.csv for refere
 
 # Run the unit test
 $ python unit_test.py --indoor ./test_data/benchmark_in.jpg --outdoor ./test_data/benchmark_out.jpg
+
+# Improve the model - suggestions (future work)
+
+1. Increase more relevant data based on the use case.
+2. Try to adapt and use normalisation free network based models to avoid gradient exploded problem. It uses the adaptive gradient clipping by setting threshold of the hyper parameters. Please refer the below reference for the comparison between efficientNet and Nfnet .
+ https://medium.com/analytics-vidhya/paper-explained-normalizer-free-nets-nfnets-high-performance-large-scale-image-recognition-75518978b1fe
+ 
+
 
 
 
