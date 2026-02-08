@@ -1,6 +1,4 @@
-tensorflow
-sklearn==0.22.1
-Keras==2.3.1
-numpy==1.18.1
-tensorboard =2.3
-pandas== 1.15
+tensorflow>=2.10,<2.17
+numpy>=1.23,<2.0
+pandas>=1.5,<3.0
+scikit-learn>=1.2,<2.0

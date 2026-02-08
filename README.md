@@ -1,69 +1,83 @@
 # ImageClassification
-An EfficientNetB4 based Image classifier for indoor and outdoor images of some categories selected from YouTube-8m dataset. 
 
-# Installation
-Numpy
+Indoor vs outdoor image classification using TensorFlow/Keras and EfficientNet.
 
-Tensorflow ==2.3
+## What was improved
 
-keras
+- Consolidated repeated inference logic into a reusable module: `image_classification/`.
+- Refactored all scripts into robust CLIs with argument validation.
+- Removed deprecated training APIs (`fit_generator`) and added validation + early stopping.
+- Fixed evaluation correctness (`classification_report` now receives `y_true, y_pred` in proper order).
+- Cleaned dependency definitions and added a practical `.gitignore`.
 
-pandas
+## Project structure
 
-sklearn
+- `train.py`: model training
+- `pred.py`: single-image inference
+- `run_evaluation.py`: class-folder evaluation + CSV report
+- `unit_test.py`: quick benchmark check on one indoor and one outdoor image
+- `image_classification/inference.py`: shared prediction utilities
 
-ffmpeg
+## Installation
 
-youtube-dl
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-$ pip3 install -r requirements.txt
+## Dataset layout
 
-# Download the video from selected categories and extract the frames
-The dataset has 6470 images with the following categories such as:
+`train.py` expects:
 
-Classroom - Indoor
+```text
+images/
+  indoor/
+    img1.jpg
+    ...
+  outdoor/
+    img2.jpg
+    ...
+```
 
-Kitchen   - Indoor
+## Train
 
-library   - Indoor
+```bash
+python train.py \
+  --train-dir ./images \
+  --output-dir ./training_1 \
+  --epochs 10 \
+  --batch-size 16
+```
 
-school    - Indoor
+Model output is saved to `./training_1/saved_model.keras`.
 
-sea       - Outdoor
+## Inference
 
-sky       - Outdoor
+```bash
+python pred.py \
+  --input ./test_data/indoor/benchmark_in.jpg \
+  --model-path ./training_1/saved_model.keras \
+  --threshold 0.5
+```
 
-mountain  - Outdoor
+## Evaluation
 
-airplanes - Outdoor
+```bash
+python run_evaluation.py \
+  --class_1 ./test_data/indoor \
+  --class_2 ./test_data/outdoor \
+  --model-path ./training_1/saved_model.keras \
+  --out-path ./evaluation.csv
+```
 
+## Quick benchmark check
 
-# To train the model
-$ python train.py
+```bash
+python unit_test.py \
+  --indoor ./test_data/indoor/benchmark_in.jpg \
+  --outdoor ./test_data/outdoor/benchmark_out.jpg \
+  --model-path ./training_1/saved_model.keras
+```
 
-# Download the model
-https://filetransfer.io/data-package/5os1lDnu#link
-
-# Run the inference script(CLI)
-$ python pred.py --input ./test_data/im1.jpg
-
-# Run the evaluation script
-$ python run_evaluation.py --class_1 ./test_data/indoor/ --class_2 ./test_data/outdoor/ --out_path ./
-
-the findings of the evaluation script will be saved in evaluation.csv for reference.
-
-# Run the unit test
-$ python unit_test.py --indoor ./test_data/benchmark_in.jpg --outdoor ./test_data/benchmark_out.jpg
-
-# Improve the model - suggestions (future work)
-
-1. Increase more relevant data based on the use case.
-2. Try to adapt and use normalisation free network based models to avoid gradient exploded problem. It uses the adaptive gradient clipping by setting threshold of the hyper parameters. Please refer the below reference for the comparison between efficientNet and Nfnet .
- https://medium.com/analytics-vidhya/paper-explained-normalizer-free-nets-nfnets-high-performance-large-scale-image-recognition-75518978b1fe
- 
-
-
-
-
- 
-
+This command returns non-zero if predictions do not match expected classes.

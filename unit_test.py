@@ -1,32 +1,55 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-import tensorflow as tf
-import numpy as np
-import matplotlib.pyplot as plt
 import argparse
+import sys
+
+from image_classification.inference import (
+    DEFAULT_IMAGE_SIZE,
+    load_model,
+    predict_probability,
+    probability_to_label,
+)
 
 
-model = tf.keras.models.load_model("./training_1/saved_model/")
-# path = args.input
-def pred(args):
-    indoor = args.indoor
-    outdoor = args.outdoor
-    image = tf.keras.preprocessing.image.load_img(indoor,target_size=(380,380))
-    input_arr = tf.keras.preprocessing.image.img_to_array(image)
-    input_arr = np.expand_dims(input_arr, axis=0)
-    pred_in = model.predict(input_arr)
-    
-    image = tf.keras.preprocessing.image.load_img(outdoor,target_size=(380,380))
-    input_arr = tf.keras.preprocessing.image.img_to_array(image)
-    input_arr = np.expand_dims(input_arr, axis=0)
-    pred_out = model.predict(input_arr)
-#     "{:.2f}".format(a_flsoat)
-    print(" indoor: ", "{:.2f}".format(100-(pred_in[0][0]*100)),"%")
-    print(" outdoor: ", "{:.2f}".format(pred_out[0][0]*100),"%")
-    
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Quick benchmark validation on two images")
+    parser.add_argument("--indoor", required=True, help="Expected indoor image path")
+    parser.add_argument("--outdoor", required=True, help="Expected outdoor image path")
+    parser.add_argument(
+        "--model-path",
+        default="./training_1/saved_model",
+        help="Path to saved model directory/file",
+    )
+    parser.add_argument("--threshold", type=float, default=0.5, help="Decision threshold")
+    parser.add_argument(
+        "--image-size",
+        type=int,
+        nargs=2,
+        default=list(DEFAULT_IMAGE_SIZE),
+        metavar=("HEIGHT", "WIDTH"),
+        help="Input image size used by the model",
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    model = load_model(args.model_path)
+    image_size = tuple(args.image_size)
+
+    indoor_prob = predict_probability(model, args.indoor, image_size)
+    outdoor_prob = predict_probability(model, args.outdoor, image_size)
+
+    indoor_pred = probability_to_label(indoor_prob, args.threshold)
+    outdoor_pred = probability_to_label(outdoor_prob, args.threshold)
+
+    print(f"indoor_image_p_outdoor={indoor_prob:.4f} predicted={indoor_pred}")
+    print(f"outdoor_image_p_outdoor={outdoor_prob:.4f} predicted={outdoor_pred}")
+
+    passed = indoor_pred == "indoor" and outdoor_pred == "outdoor"
+    if not passed:
+        print("benchmark_result=FAIL")
+        sys.exit(1)
+    print("benchmark_result=PASS")
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--indoor', required=True, help="indoor_image" )
-    parser.add_argument('--outdoor', required=True, help="outdoor_image" )
-    args = parser.parse_args()
-    pred(args)
+    main()

@@ -1,0 +1,17 @@
+.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# model/checkpoint artifacts
+training_1/
+*.h5
+*.keras
+*.ckpt*
+
+# logs and generated outputs
+Graph/
+logs/
+evaluation.csv
